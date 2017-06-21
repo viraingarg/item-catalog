@@ -268,11 +268,15 @@ def deleteRestaurant(restaurant_id):
         return redirect('/login')
     restaurantToDelete = session.query(
         Restaurant).filter_by(id=restaurant_id).one()
-    if editedRestaurant.user_id != login_session['user_id']:
-        flash('You are not permitted to edit %s' % editedRestauarant.name)
+    itemToDelete = session.query(MenuItem).filter_by(restaurant_id = restaurant_id)
+    if restaurantToDelete.user_id != login_session['user_id']:
+        flash('You are not permitted to edit %s' % restaurantToDelete.name)
         return redirect(url_for('showRestaurants'))
     if request.method == 'POST':
+        for i in itemToDelete:
+            deleteMenuItem(restaurantToDelete, i)
         session.delete(restaurantToDelete)
+        
         flash('%s Successfully Deleted' % restaurantToDelete.name)
         session.commit()
         return redirect(url_for('''show
